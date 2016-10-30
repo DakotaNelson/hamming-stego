@@ -3,6 +3,7 @@ import numpy as np
 
 from hamming import str_to_bin
 
+
 def set_bit(val, bitNo, bit):
     """ given a value, which bit in the value to set, and the actual bit
     (0 or 1) to set, return the new value with the proper bit flipped """
@@ -12,7 +13,7 @@ def set_bit(val, bitNo, bit):
         val |= mask
     return val
 
-def encode(img, msg, bits=[1]):
+def insert(img, msg, bits=[1]):
     """ given an image as a numpy matrix and a message as an array of ones
     and zeros, encode the message into the image steganographically and return
     a numpy array representing the image
@@ -63,15 +64,32 @@ def encode(img, msg, bits=[1]):
 
     return img
 
+def extract(img, bits=[1]):
+    """ given an image as a numpy matrix, extract steganographically encoded
+    data from the image, returning a list of bits (integer 1 or 0) representing
+    the message extracted
+    optional:
+        bits -> which bits to encode the message into; passing [0] will only
+                encode into the least significant bit of the image, while
+                passing [0, 1, 2, 3, 4, 5, 6, 7] would return the message as
+                a numpy array
+    """
 
-if __name__ == "__main__":
-    # first, open the original image
-    imgpath = 'image.bmp'
-    img = Image.open(imgpath)
+    try:
+        bits = set(bits) # dedupe
+        for bit in bits:
+            # make sure the bits the user has told us to encode into
+            # actually exist
+            assert bit in range(8)
+    except:
+        raise ValueError("bits must be specified as 0 through 7")
 
-    message = str_to_bin('this is a message')
+    msg = []
 
-    img = encode(np.asarray(img), [0, 0, 0, 0], bits=[1])
-    im = Image.fromarray(img)
+    for val in np.nditer(img):
+        # val is either the R, G, or B channel of one pixel
+        byte = '{:08b}'.format(int(val))
+        for bit in bits:
+            msg.append(int(byte[-(bit+1)]))
 
-    im.save("image_steg.bmp")
+    return np.array(msg).reshape((-1, 8))

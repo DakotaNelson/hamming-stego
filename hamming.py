@@ -1,8 +1,4 @@
-from PIL import Image, ImageFilter
-from matplotlib.pyplot import imshow
 import numpy as np
-import sys
-import textwrap
 
 from math import floor
 
@@ -117,48 +113,52 @@ def decode(msg):
 
 
 ###############################################################################
-message = 'this is a message we plan to hide'
-bin_message = str_to_bin(message)
 
-print("original message:")
-print(bin_message)
-print("")
+if __name__ == "__main__":
+    # do a demo!
 
-# now that we have a message, encode it using the hamming code
-encoded = encode(bin_message)
+    message = 'this is a message we plan to hide'
+    bin_message = str_to_bin(message)
 
-print("encoded to:")
-print(encoded)
-print("")
+    print("original message:")
+    print(bin_message)
+    print("")
 
-# introduce noise (this simulates transmission)
-transmitted = encoded
-transmitted[0, 2] = 0
+    # now that we have a message, encode it using the hamming code
+    encoded = encode(bin_message)
 
-print("we transmitted:")
-print(bin_to_str(decode(transmitted)))
-print("")
+    print("encoded to:")
+    print(encoded)
+    print("")
 
-# and calculate an error syndrome
-syndrome = syndrome(transmitted)
+    # introduce noise (this simulates transmission)
+    transmitted = encoded
+    transmitted[0, 2] = 0
 
-print("which has a syndrome of:")
-print(syndrome)
-print("")
+    print("we transmitted:")
+    print(bin_to_str(decode(transmitted)))
+    print("")
 
-# use the error syndrome to correct the received message
-corrected = correct(transmitted, syndrome)
-print("corrected to:")
-print(corrected)
-print("")
+    # and calculate an error syndrome
+    syndrome = syndrome(transmitted)
 
-# decode the now-corrected message
-decoded = decode(corrected)
-# print(bin_message)
-print("decoded to:")
-print(decoded)
-print("")
+    print("which has a syndrome of:")
+    print(syndrome.T)
+    print("")
 
-print("and finally:")
-print(bin_to_str(decoded))
-print("")
+    # use the error syndrome to correct the received message
+    corrected = correct(transmitted, syndrome)
+    print("corrected to:")
+    print(corrected)
+    print("")
+
+    # decode the now-corrected message
+    decoded = decode(corrected)
+    # print(bin_message)
+    print("decoded to:")
+    print(decoded)
+    print("")
+
+    print("and finally:")
+    print(bin_to_str(decoded))
+    print("")
